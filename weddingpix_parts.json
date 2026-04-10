@@ -1,0 +1,87 @@
+{
+  "generatedAt": "2026-04-10T21:21:34.288Z",
+  "sourcePdf": "weddingpix_sum.pdf",
+  "sourceSizeBytes": 171509723,
+  "totalPages": 17,
+  "maxPartSizeBytes": 20971520,
+  "parts": [
+    {
+      "file": "weddingpix_part01.pdf",
+      "startPage": 1,
+      "endPage": 3,
+      "sizeBytes": 20788158
+    },
+    {
+      "file": "weddingpix_part02.pdf",
+      "startPage": 4,
+      "endPage": 4,
+      "sizeBytes": 13888950
+    },
+    {
+      "file": "weddingpix_part03.pdf",
+      "startPage": 5,
+      "endPage": 5,
+      "sizeBytes": 13160329
+    },
+    {
+      "file": "weddingpix_part04.pdf",
+      "startPage": 6,
+      "endPage": 6,
+      "sizeBytes": 10341770
+    },
+    {
+      "file": "weddingpix_part05.pdf",
+      "startPage": 7,
+      "endPage": 8,
+      "sizeBytes": 15944333
+    },
+    {
+      "file": "weddingpix_part06.pdf",
+      "startPage": 9,
+      "endPage": 9,
+      "sizeBytes": 10261549
+    },
+    {
+      "file": "weddingpix_part07.pdf",
+      "startPage": 10,
+      "endPage": 10,
+      "sizeBytes": 14189734
+    },
+    {
+      "file": "weddingpix_part08.pdf",
+      "startPage": 11,
+      "endPage": 11,
+      "sizeBytes": 11404729
+    },
+    {
+      "file": "weddingpix_part09.pdf",
+      "startPage": 12,
+      "endPage": 12,
+      "sizeBytes": 13419460
+    },
+    {
+      "file": "weddingpix_part10.pdf",
+      "startPage": 13,
+      "endPage": 13,
+      "sizeBytes": 9440760
+    },
+    {
+      "file": "weddingpix_part11.pdf",
+      "startPage": 14,
+      "endPage": 14,
+      "sizeBytes": 13556995
+    },
+    {
+      "file": "weddingpix_part12.pdf",
+      "startPage": 15,
+      "endPage": 15,
+      "sizeBytes": 18138947
+    },
+    {
+      "file": "weddingpix_part13.pdf",
+      "startPage": 16,
+      "endPage": 17,
+      "sizeBytes": 6973746
+    }
+  ]
+}

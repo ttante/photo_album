@@ -1,0 +1,16 @@
+{
+  "name": "wedddingpicsgist",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "split:pdf": "node scripts/split-pdf.js",
+    "split:pdf:web": "node scripts/split-pdf.js --max-mb=20"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  }
+}
