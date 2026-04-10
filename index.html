@@ -5,194 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wedding Photos</title>
     <style>
-      :root {
-        --bg: #f6f3eb;
-        --ink: #2f2a24;
-        --panel: #fffdfa;
-        --accent: #7a4a2c;
-        --accent-soft: #e9d7c4;
-        --muted: #6f655b;
-      }
-
       * {
         box-sizing: border-box;
       }
 
       body {
         margin: 0;
-        min-height: 100vh;
-        font-family: "Georgia", "Times New Roman", serif;
-        color: var(--ink);
-        background:
-          radial-gradient(circle at 0% 0%, #fff, transparent 45%),
-          radial-gradient(circle at 100% 100%, #f0e4d4, transparent 40%),
-          var(--bg);
+        background: #ffffff;
+        color: #111111;
+        font-family: Arial, sans-serif;
       }
 
-      .wrap {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      .panel {
-        border: 1px solid #e7dfd2;
-        border-radius: 16px;
-        padding: 16px;
-        background: var(--panel);
-        box-shadow: 0 10px 30px rgba(42, 30, 20, 0.06);
-      }
-
-      h1 {
-        margin: 0;
-        font-size: clamp(1.4rem, 3.2vw, 2rem);
-      }
-
-      p {
-        margin: 10px 0 0;
-        color: var(--muted);
-      }
-
-      .toolbar {
-        margin-top: 14px;
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .part-btn {
-        border: 1px solid #d8c8b4;
-        border-radius: 999px;
-        background: #fff;
-        color: var(--ink);
-        padding: 8px 14px;
-        cursor: pointer;
-      }
-
-      .part-btn:hover {
-        border-color: var(--accent);
-      }
-
-      .part-btn.active {
-        background: var(--accent);
-        color: #fff;
-        border-color: var(--accent);
-      }
-
-      .status {
-        margin-top: 10px;
-        font-size: 0.95rem;
-      }
-
-      .actions {
-        margin-top: 10px;
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .actions a {
-        color: var(--accent);
-        text-underline-offset: 2px;
-      }
-
-      .viewer {
-        margin-top: 16px;
-        width: 100%;
-        height: min(75vh, 1000px);
-        border: 1px solid #e3d8ca;
-        border-radius: 12px;
-        background: #fff;
-      }
-
-      .error {
-        margin-top: 12px;
+      #status {
+        text-align: center;
         padding: 10px 12px;
-        border: 1px solid #f2b7b7;
-        border-radius: 10px;
-        background: #fff0f0;
+        font-size: 14px;
+      }
+
+      #pages {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 8px 0 16px;
+      }
+
+      .page {
+        width: 100%;
+        margin: 0 0 10px;
+        display: block;
       }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   </head>
   <body>
-    <div class="wrap">
-      <section class="panel">
-        <h1>Wedding Photo Collage</h1>
-        <p>
-          This album is split into parts so it can be hosted on GitHub Pages.
-          Pick a part below to view it.
-        </p>
-
-        <div id="partToolbar" class="toolbar"></div>
-        <div id="status" class="status">Loading album details...</div>
-
-        <div class="actions">
-          <a id="downloadLink" href="#" download>Download current part</a>
-          <a href="weddingpix_parts.json" target="_blank" rel="noopener">View file list (JSON)</a>
-        </div>
-
-        <iframe
-          id="pdfViewer"
-          class="viewer"
-          title="Wedding Photos PDF Viewer"
-          loading="lazy"
-        ></iframe>
-
-        <div id="error" class="error" hidden></div>
-      </section>
-    </div>
+    <div id="status">Loading photos...</div>
+    <main id="pages"></main>
 
     <script>
-      const toolbar = document.getElementById("partToolbar");
       const statusEl = document.getElementById("status");
-      const viewer = document.getElementById("pdfViewer");
-      const downloadLink = document.getElementById("downloadLink");
-      const errorEl = document.getElementById("error");
+      const pagesEl = document.getElementById("pages");
 
-      const formatMb = (bytes) => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-      function openPart(part, button) {
-        const base = encodeURI(part.file);
-        viewer.src = `${base}#view=FitH`;
-        downloadLink.href = base;
-        downloadLink.setAttribute("download", part.file);
+      async function renderPage(page) {
+        const deviceScale = window.devicePixelRatio || 1;
+        const maxWidth = Math.min(window.innerWidth, 1200);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const cssScale = maxWidth / baseViewport.width;
+        const viewport = page.getViewport({ scale: cssScale });
 
-        [...toolbar.querySelectorAll(".part-btn")].forEach((btn) =>
-          btn.classList.remove("active")
-        );
-        if (button) button.classList.add("active");
+        const canvas = document.createElement("canvas");
+        canvas.className = "page";
+        canvas.width = Math.floor(viewport.width * deviceScale);
+        canvas.height = Math.floor(viewport.height * deviceScale);
+        canvas.style.width = `${Math.floor(viewport.width)}px`;
+        canvas.style.height = `${Math.floor(viewport.height)}px`;
 
-        statusEl.textContent = `Showing ${part.file} (pages ${part.startPage}-${part.endPage}, ${formatMb(part.sizeBytes)})`;
+        const context = canvas.getContext("2d", { alpha: false });
+        context.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
+
+        await page.render({ canvasContext: context, viewport }).promise;
+        pagesEl.appendChild(canvas);
       }
 
-      async function loadAlbum() {
-        try {
-          const res = await fetch("weddingpix_parts.json", { cache: "no-store" });
-          if (!res.ok) throw new Error("Missing weddingpix_parts.json");
-          const manifest = await res.json();
-          if (!Array.isArray(manifest.parts) || manifest.parts.length === 0) {
-            throw new Error("No PDF parts found in manifest.");
-          }
+      async function renderPart(file) {
+        const loadingTask = pdfjsLib.getDocument(file);
+        const doc = await loadingTask.promise;
 
-          manifest.parts.forEach((part, i) => {
-            const btn = document.createElement("button");
-            btn.className = "part-btn";
-            btn.type = "button";
-            btn.textContent = `Part ${i + 1}`;
-            btn.addEventListener("click", () => openPart(part, btn));
-            toolbar.appendChild(btn);
-          });
-
-          const firstBtn = toolbar.querySelector(".part-btn");
-          openPart(manifest.parts[0], firstBtn);
-        } catch (err) {
-          errorEl.hidden = false;
-          errorEl.textContent = `Could not load album: ${err.message}`;
-          statusEl.textContent = "Album failed to load.";
+        for (let p = 1; p <= doc.numPages; p += 1) {
+          const page = await doc.getPage(p);
+          await renderPage(page);
         }
       }
 
-      loadAlbum();
+      async function run() {
+        try {
+          const res = await fetch("weddingpix_parts.json", { cache: "no-store" });
+          if (!res.ok) throw new Error("Missing album files.");
+          const manifest = await res.json();
+          if (!manifest.parts || !manifest.parts.length) {
+            throw new Error("No album parts found.");
+          }
+
+          for (let i = 0; i < manifest.parts.length; i += 1) {
+            statusEl.textContent = `Loading photos (${i + 1}/${manifest.parts.length})...`;
+            await renderPart(manifest.parts[i].file);
+          }
+
+          statusEl.remove();
+        } catch (err) {
+          statusEl.textContent = `Could not load album: ${err.message}`;
+        }
+      }
+
+      run();
     </script>
   </body>
 </html>
